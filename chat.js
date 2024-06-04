@@ -1,5 +1,5 @@
 // create a simple chat application that can be invoked from terminal, it will use open-ai to provide response to the queries
-// import 'dotenv/config';
+import 'dotenv/config';
 import { openai } from './openai.js';
 import readline from 'node:readline';
 
@@ -29,7 +29,7 @@ const chat = () => {
   const history = [
     {
       role: 'system',
-      content: `You are a helpful assistant that provides information. Answer the user's questions to the best of your ability`
+      content: `You are a helpful assistant that provides information. Answer the user's questions to the best of your ability. Only answer the question related to technology. If user ask non-technical question, refuse to answer`
     }
   ]
 
@@ -41,7 +41,7 @@ const chat = () => {
       }
 
       const userMessage = formatMessage(message)
-      const response = await getNewMessage(history, userMessage, false)
+      const response = await getNewMessage(history, userMessage, true)
       
 
       response?.content && history.push(userMessage, response);

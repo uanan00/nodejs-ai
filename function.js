@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { openai } from "./openai.js";
 import math from "advanced-calculator";
-import sendEmail from "./utils/sendEmail.js";
 const QUESTION = process.argv[2] || "hi";
 
 const messages = [
@@ -11,13 +10,15 @@ const messages = [
   },
 ];
 
-console.log('Question', QUESTION)
 
 const functions = {
   calculate: async ({expression}) => {
     return math.evaluate(expression);
   },
-  sendEmail: async({to, subject, text}) => await sendEmail({to, subject, text})
+  generateImage: async ({prompt}) => {
+    const generatedImage = await openai.images.generate({prompt})
+    return generatedImage.data[0].url;
+  }
 };
 
 const tools = [
@@ -42,25 +43,18 @@ const tools = [
   {
     type: "function",
     function: {
-      name: "sendEmail",
-      description: "Send a mail to user with subject and text",
+      name: "generateImage",
+      description: "generate an image",
       parameters: {
         type: "object",
         properties: {
-          to: {
+          prompt: {
             type: "string",
-            description: "The email address of user to send mail to",
-          },
-          subject: {
-            type: "string",
-            description: "Subject of email",
-          },
-          text: {
-            type: "string",
-            description: "The text that we want to send in email",
+            description:
+              'The prompt for which we need to generate image',
           },
         },
-        required: ["to", 'subject', 'text'],
+        required: ["prompt"],
       },
     },
   },
@@ -80,7 +74,6 @@ const getCompletion = async (messages) => {
 let response;
 
   response = await getCompletion(messages);
-  console.log('response', response)
 
   const responseMessage = response.choices[0].message;
   messages.push(responseMessage)
@@ -89,7 +82,7 @@ let response;
   // Step 2: check if the model wanted to call a function
   const toolCalls = responseMessage.tool_calls;
 
-  console.log('toolCalls', toolCalls)
+  
 
   if (responseMessage.tool_calls) {
     

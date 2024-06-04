@@ -47,16 +47,18 @@ const createStore = () =>
     movies.map(
       (movie) =>
         new Document({
-          pageContent: ` `,
+          pageContent: ` ${movie.title} ${movie.description}`,
           metadata: { source: movie.id, title: movie.title },
         })
     ),
-    new OpenAIEmbeddings()
+    new OpenAIEmbeddings({
+      model: "text-embedding-3-large",
+    })
   );
 
-export const search = async (query, count = 2) => {
+export const search = async (query, count = 3) => {
   const store = await createStore();
   return store.similaritySearch(query, count);
 };
 
-console.log(await search("A movie that will make me mad"));
+console.log(await search("Something cute"));

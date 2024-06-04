@@ -65,7 +65,7 @@ const query = async () => {
       {
         role: "system",
         content:
-          "You are a helpful AI assistant. Answer questions to your best ability.",
+          "You are a helpful AI assistant. Answer questions to your best ability based on context that I will provide. If question doesn't match with context, reply that you need more context",
       },
       {
         role: "user",
